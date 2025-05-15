@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhân Ma Trận Hình Chữ Nhật</title>
+    <style>
+        body {
+            font-family: 'Comic Neue', cursive;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffe6f0;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #ff6699;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            font-family: 'Kanit', sans-serif; /* Thay font cho tiêu đề */
+            font-weight: 700;
+        }
+        .matrix-input {
+            margin: 20px 0;
+            background-color: #fff0f5;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .matrix-input label {
+            font-weight: bold;
+            color: #ff6699;
+            margin-right: 10px;
+        }
+        .matrix-input input[type="number"] {
+            padding: 8px;
+            width: 60px;
+            margin-right: 10px;
+            border: 2px solid #ffb3cc;
+            border-radius: 10px;
+            background-color: #fff;
+            font-family: 'Comic Neue', cursive;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #ff99cc;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: 'Comic Neue', cursive;
+            font-size: 1.1em;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            background-color: #ff80b3;
+            transform: scale(1.05);
+        }
+        #matrixA, #matrixB, #resultMatrix {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff0f5;
+            border: 2px solid #ffb3cc;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .matrix {
+            display: inline-block;
+            margin: 10px;
+        }
+        .matrix div {
+            display: flex;
+        }
+        .matrix input {
+            width: 50px;
+            margin: 4px;
+            text-align: center;
+            border: 2px solid #ffb3cc;
+            border-radius: 10px;
+            background-color: #fff;
+            font-family: 'Comic Neue', cursive;
+        }
+        .matrix input[readonly] {
+            background-color: #ffe6f0;
+            border-color: #ff99cc;
+        }
+        #error {
+            color: #ff3333;
+            margin-top: 10px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        h3 {
+            color: #ff6699;
+            margin-bottom: 10px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Kanit:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Nhân Hai Ma Trận</h1>
+
+    <div class="matrix-input">
+        <label>Matrix A (m x n):</label>
+        <input type="number" id="rowsA" min="1" value="2" placeholder="Hàng">
+        <input type="number" id="colsA" min="1" value="2" placeholder="Cột">
+    </div>
+    <div class="matrix-input">
+        <label>Matrix B (n x p):</label>
+        <input type="number" id="rowsB" min="1" value="2" placeholder="Hàng">
+        <input type="number" id="colsB" min="1" value="2" placeholder="Cột">
+    </div>
+    <button onclick="generateMatrices()">Create Matrix</button>
+
+    <div id="matrixA"></div>
+    <div id="matrixB"></div>
+    <button onclick="multiplyMatrices()" style="display: none;" id="multiplyBtn">Nhân Ma Trận</button>
+    <div id="resultMatrix"></div>
+    <div id="error"></div>
+
+    <script>
+        function generateMatrices() {
+            const rowsA = parseInt(document.getElementById('rowsA').value);
+            const colsA = parseInt(document.getElementById('colsA').value);
+            const rowsB = parseInt(document.getElementById('rowsB').value);
+            const colsB = parseInt(document.getElementById('colsB').value);
+            const errorDiv = document.getElementById('error');
+
+            // Kiểm tra điều kiện nhân ma trận
+            if (colsA !== rowsB) {
+                errorDiv.innerHTML = "Số cột của ma trận A phải bằng số hàng của ma trận B!";
+                document.getElementById('multiplyBtn').style.display = 'none';
+                document.getElementById('matrixA').innerHTML = '';
+                document.getElementById('matrixB').innerHTML = '';
+                document.getElementById('resultMatrix').innerHTML = '';
+                return;
+            }
+
+            errorDiv.innerHTML = '';
+            document.getElementById('multiplyBtn').style.display = 'block';
+
+            // Tạo ma trận A
+            let matrixA = '<h3>Matrix A</h3><div class="matrix">';
+            for (let i = 0; i < rowsA; i++) {
+                matrixA += '<div>';
+                for (let j = 0; j < colsA; j++) {
+                    matrixA += `<input type="number" id="a_${i}_${j}" value="0">`;
+                }
+                matrixA += '</div>';
+            }
+            matrixA += '</div>';
+            document.getElementById('matrixA').innerHTML = matrixA;
+
+            // Tạo ma trận B
+            let matrixB = '<h3>Matrix B</h3><div class="matrix">';
+            for (let i = 0; i < rowsB; i++) {
+                matrixB += '<div>';
+                for (let j = 0; j < colsB; j++) {
+                    matrixB += `<input type="number" id="b_${i}_${j}" value="0">`;
+                }
+                matrixB += '</div>';
+            }
+            matrixB += '</div>';
+            document.getElementById('matrixB').innerHTML = matrixB;
+
+            document.getElementById('resultMatrix').innerHTML = '';
+        }
+
+        function multiplyMatrices() {
+            const rowsA = parseInt(document.getElementById('rowsA').value);
+            const colsA = parseInt(document.getElementById('colsA').value);
+            const rowsB = parseInt(document.getElementById('rowsB').value);
+            const colsB = parseInt(document.getElementById('colsB').value);
+
+            // Lấy giá trị ma trận A
+            let A = [];
+            for (let i = 0; i < rowsA; i++) {
+                A[i] = [];
+                for (let j = 0; j < colsA; j++) {
+                    A[i][j] = parseFloat(document.getElementById(`a_${i}_${j}`).value) || 0;
+                }
+            }
+
+            // Lấy giá trị ma trận B
+            let B = [];
+            for (let i = 0; i < rowsB; i++) {
+                B[i] = [];
+                for (let j = 0; j < colsB; j++) {
+                    B[i][j] = parseFloat(document.getElementById(`b_${i}_${j}`).value) || 0;
+                }
+            }
+
+            // Nhân ma trận
+            let result = [];
+            for (let i = 0; i < rowsA; i++) {
+                result[i] = [];
+                for (let j = 0; j < colsB; j++) {
+                    let sum = 0;
+                    for (let k = 0; k < colsA; k++) {
+                        sum += A[i][k] * B[k][j];
+                    }
+                    result[i][j] = sum;
+                }
+            }
+
+            // Hiển thị kết quả
+            let resultMatrix = '<h3>Ma trận Kết Quả</h3><div class="matrix">';
+            for (let i = 0; i < rowsA; i++) {
+                resultMatrix += '<div>';
+                for (let j = 0; j < colsB; j++) {
+                    resultMatrix += `<input type="number" value="${result[i][j]}" readonly>`;
+                }
+                resultMatrix += '</div>';
+            }
+            resultMatrix += '</div>';
+            document.getElementById('resultMatrix').innerHTML = resultMatrix;
+        }
+    </script>
+</body>
+</html>
